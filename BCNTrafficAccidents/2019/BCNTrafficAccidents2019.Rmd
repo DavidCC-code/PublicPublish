@@ -1,6 +1,6 @@
 ---
 title: "Accidents de trànsit a Barcelona - 2019"
-subtitle: " Barcelona traffic accidenmts - 2019"
+subtitle: " Barcelona traffic accidents - 2019"
 author: "David Contreras"
 date: "16/2/2021"
 output: html_document
