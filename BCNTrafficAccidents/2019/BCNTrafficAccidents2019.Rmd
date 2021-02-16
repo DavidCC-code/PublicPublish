@@ -1,0 +1,65 @@
+---
+title: "Accidents de trànsit a Barcelona - 2019"
+subtitle: " Barcelona traffic accidenmts - 2019"
+author: "David Contreras"
+date: "16/2/2021"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE, warning=FALSE, message= FALSE)
+```
+
+```{r load data}
+library(leaflet)
+library(colorRamps)
+
+url <- "https://opendata-ajuntament.barcelona.cat/data/dataset/834b8920-0685-4e16-8e20-faf13645f4f3/resource/4bf617c6-7fe0-4e6a-b010-1c6fef544a31/download/2019_accidents_tipus_gu_bcn_.csv"
+destFile <- "./accidents2019.csv"
+download.file(url, destFile)
+
+ACC2019 <- read.csv(destFile, encoding="UTF-8")
+
+accidents <-data.frame(lat = ACC2019$Latitud,
+                       lng = ACC2019$Longitud,
+                       tipus = as.factor(ACC2019$Descripcio_tipus_accident),
+                       data = paste(ACC2019$Dia_mes,ACC2019$Mes_any, "2019", sep="/")
+                        )
+```
+
+
+
+```{r setup map }
+library(colorRamps)
+labs <- lapply(seq(nrow(accidents)), function(i) {
+  paste0( '<p><b>', accidents[i, "tipus"], '</b><p></p>', 
+          accidents[i, "data"],'</p>' ) 
+})
+
+pal <- colorFactor( palette = primary.colors(length(levels(accidents$tipus))),
+                    domain = accidents$tipus)
+
+mapa <-accidents %>%
+       leaflet( width = "100%")  %>%
+       addTiles() %>%
+       addCircleMarkers(color = pal(accidents$tipus),
+                        clusterOptions = markerClusterOptions(),
+                        opacity = 1,
+                        label= lapply(labs, htmltools::HTML))
+    
+```
+
+
+```{r legend}
+mapa <- mapa %>% addLegend(position = "topright",
+                   pal= pal,
+                   values = accidents$tipus ) 
+  
+
+```
+
+
+```{r display map}
+
+mapa
+```
