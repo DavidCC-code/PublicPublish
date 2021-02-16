@@ -1,0 +1,59 @@
+---
+title: "Barcelona Traffic accident density 2019"
+author: "David Contreras"
+date: "16/2/2021"
+output: ioslides_presentation
+---
+
+```{r setup, include=FALSE}
+  knitr::opts_chunk$set(echo = FALSE, message =FALSE, warning =FALSE)
+```
+
+## 2019 Barcelona traffic accidents
+
+
+This presentation show a heat map of traffic accidents occurred in the city of Barcelona and managed by Barcelona's local police, Guàrdia Urbana de Barcelona. 
+
+
+## Density map
+
+```{r read data}
+url <- "https://opendata-ajuntament.barcelona.cat/data/dataset/834b8920-0685-4e16-8e20-faf13645f4f3/resource/4bf617c6-7fe0-4e6a-b010-1c6fef544a31/download/2019_accidents_tipus_gu_bcn_.csv"
+destFile <- "./accidents2019.csv"
+download.file(url, destFile)
+
+ACC2019 <- read.csv(destFile, encoding="UTF-8")
+
+accidents <-data.frame(lat = ACC2019$Latitud,
+                       lng = ACC2019$Longitud,
+                       tipus = as.factor(ACC2019$Descripcio_tipus_accident),
+                       data = paste(ACC2019$Dia_mes,ACC2019$Mes_any, "2019", sep="/")
+                        )
+```
+
+
+
+```{r map}
+library(plotly)
+
+fig <- accidents %>%
+  plot_ly(
+    type = 'densitymapbox',
+    lat = ~lat,
+    lon = ~lng,
+    coloraxis = 'coloraxis',
+    radius =5.5) 
+
+fig <- fig %>%
+  layout(
+    mapbox = list(
+      style="open-street-map",
+      center= list(lat=41.4,lon=2.16), 
+      zoom =11),
+       coloraxis = list(colorscale = "Viridis")
+     )
+
+
+fig
+
+```
